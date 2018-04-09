@@ -36,3 +36,7 @@ data Result = Result { rePoints    :: Points
 
 data Correctness = Total | Partial | None
                  deriving (Read, Show)
+
+data AnswerResult = AnswerResult    { arAns :: Answer 
+                                    , arRes :: Result 
+                                    } deriving (Read, Show)

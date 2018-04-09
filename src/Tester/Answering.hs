@@ -31,3 +31,8 @@ questionSeparator :: String
 questionSeparator = replicate 50 '-'
 
 -- TODO: finish with functions you need...
+rightAnswer :: Answer -> String
+rightAnswer SingleChoice{ ascChoices = chs } = "Correct answer: " ++ show chs
+rightAnswer MultiChoice{ amcChoices = chs } = "Correct answer: " ++ show chs
+rightAnswer TextualAnswer{ ataCorrect = ct } = "Correct answer/s: " ++ show ct
+rightAnswer NumericAnswer{ anaCorrect = cn } = "Correct answer: " ++ show cn
