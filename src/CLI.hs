@@ -10,6 +10,7 @@ import Data.Maybe
 import Tester.Model
 import Tester.Answering
 import Tester.Evaluation
+import Tester.Helpers
 import Tester.Model.AesonInstances
 
 
@@ -17,33 +18,49 @@ import Tester.Model.AesonInstances
 loadAndShow :: IO ()
 loadAndShow = do
   args <- getArgs
-  handle <- openFile (head args) ReadMode
+  handle <- openFile (parseArgsJsonFile args) ReadMode
   contentsJSON <- BS.hGetContents handle
+  let flagMode = getLearnTrainArg $ drop 1 args
   let contents = decode contentsJSON :: Maybe TestSet
   case contents of
-    Nothing -> error "Invalid JSON..."
-    Just c -> testProceed c
+    Nothing -> error "Invalid JSON file!"
+    Just c -> testProceed c flagMode
 
-testProceed :: TestSet -> IO ()
-testProceed (TestSet n i q) = do
+testProceed :: TestSet -> String -> IO ()
+testProceed (TestSet n i q) f = do
   putStrLn $ "Welcome to " ++ TL.unpack n ++ "!"
   case i of
     Just intro -> putStrLn $ TL.unpack intro
     _ -> putStrLn "Show me your knowledge young padavan!"
-  questionProceed q []
+  case f of
+    "train" -> questionTestProceed q [] True
+    "learn" -> questionLearnProceed q
+    _ -> questionTestProceed q [] False
 
-questionProceed :: [Question] -> [AnswerResult] -> IO ()
-questionProceed ((Question t a):xs) r = do
+questionLearnProceed :: [Question] -> IO ()
+questionLearnProceed ((Question t a):xs) = do
+  putStrLn questionSeparator
+  putStrLn $ TL.unpack t
+  putStrLn $ rightAnswer a
+  questionLearnProceed xs
+
+questionLearnProceed [] = putStrLn "Hope you learned something!"
+
+questionTestProceed :: [Question] -> [AnswerResult] -> Bool -> IO ()
+questionTestProceed ((Question t a):xs) r f = do
   putStrLn questionSeparator
   putStrLn $ TL.unpack t
   putStrLn $ promptAnswer a
   inp <- getLine
   let uAnswer = readAnswer inp a
   let aRes = evaluate a uAnswer
-  questionProceed xs (r ++ [AnswerResult {arAns = a, arRes = aRes}]) 
-
+  case f of
+    True -> putStrLn $ rightAnswer a
+    _ -> putStr "" 
+  questionTestProceed xs (r ++ [AnswerResult {arAns = a, arRes = aRes}]) f
+  
 -- Evaluate if there is no questions left
-questionProceed [] r = do
+questionTestProceed [] r _ = do
   putStrLn questionSeparator
   putStrLn questionSeparator
   resultsProceed r 0 0
@@ -51,7 +68,7 @@ questionProceed [] r = do
 resultsProceed :: [AnswerResult] -> Points -> Points -> IO ()
 resultsProceed ((AnswerResult a (Result s m c)):xs) ts tm = do
   case isCorrect $ Result s m c of
-    True -> putStrLn "You answered correctly!"
+    True -> putStrLn $ "You answered correctly: " ++ show s ++ " points!" 
     _ -> putStrLn $ rightAnswer a
   resultsProceed xs (ts + s) (tm + m)
 
