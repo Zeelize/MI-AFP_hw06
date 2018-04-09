@@ -2,9 +2,9 @@ module Tester.Helpers where
 
 import Tester.Model
 import System.FilePath
-import System.Random.Shuffle
 import System.Random
 import Data.List
+import System.IO.Unsafe
 
 parseArgsJsonFile :: [String] -> String
 parseArgsJsonFile (x:xs) 
@@ -20,7 +20,10 @@ getLearnTrainArg [mode]
 getLearnTrainArg _ = error "Wrong arguments!"
 
 shuffleQuestions :: [Question] -> [Question]
-shuffleQuestions q = shuffleQ (mkStdGen 666) q
+shuffleQuestions q = shuffleQ (mkStdGen userRandomNum) q
+    where 
+        userRandomNum :: Int
+        userRandomNum = unsafePerformIO $ getStdRandom (randomR (1, 100))
 
 shuffleQ :: StdGen -> [Question] -> [Question]
 shuffleQ _ [] = []
