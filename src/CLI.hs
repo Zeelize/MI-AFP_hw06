@@ -33,7 +33,7 @@ testProceed (TestSet n i q) f = do
     Just intro -> putStrLn $ TL.unpack intro
     _ -> putStrLn "Show me your knowledge young padavan!"
   case f of
-    "train" -> questionTestProceed q [] True
+    "train" -> questionTestProceed (shuffleQuestions q) [] True
     "learn" -> questionLearnProceed q
     _ -> questionTestProceed q [] False
 
