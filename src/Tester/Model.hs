@@ -21,7 +21,10 @@ data Answer = SingleChoice  { ascChoices :: [Choice] }
 
 data Choice = Choice { chText    :: !Text
                      , chScore   :: Points
-                     } deriving (Read, Show)
+                     } deriving (Read)
+
+instance Show Choice where
+    show (Choice t s) = unpack t ++ ": " ++ show s
 
 data UserAnswer = ChoicesUA [Text]
                | TextualUA !Text
