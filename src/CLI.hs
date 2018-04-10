@@ -6,6 +6,7 @@ import qualified Data.ByteString.Lazy as BS
 import qualified Data.Text.Lazy as TL
 import Data.Aeson (decode)
 import Data.Maybe
+import Turtle.Options
 
 import Tester.Model
 import Tester.Answering
@@ -13,10 +14,17 @@ import Tester.Evaluation
 import Tester.Helpers
 import Tester.Model.AesonInstances
 
+-- options parser
+optParser :: Parser (Bool, Bool)
+optParser = (,) <$> switch "shuffle" 's' "Shuffle randomly questions"
+             <*> switch  "answer"  'a' "Give correct answer immediately"
 
 -- demonstration of using aeson to load JSON file with TestSet
 loadAndShow :: IO ()
 loadAndShow = do
+  (s, a) <- options "" parser
+  print s
+  print a
   args <- getArgs
   handle <- openFile (parseArgsJsonFile args) ReadMode
   contentsJSON <- BS.hGetContents handle
@@ -24,18 +32,22 @@ loadAndShow = do
   let contents = decode contentsJSON :: Maybe TestSet
   case contents of
     Nothing -> error "Invalid JSON file!"
-    Just c -> testProceed c flagMode
+    Just c -> testProceed c flagMode s a
 
-testProceed :: TestSet -> String -> IO ()
-testProceed (TestSet n i q) f = do
+testProceed :: TestSet -> String -> Bool -> Bool -> IO ()
+testProceed (TestSet n i q) f s a = do
   putStrLn $ "Welcome to " ++ TL.unpack n ++ "!"
   case i of
     Just intro -> putStrLn $ TL.unpack intro
     _ -> putStrLn "Show me your knowledge young padavan!"
   case f of
-    "train" -> questionTestProceed q [] True
-    "learn" -> questionLearnProceed q
-    _ -> questionTestProceed q [] False
+    "train" || a -> questionTestProceed qq [] True
+    "learn" -> questionLearnProceed qq
+    _ -> questionTestProceed qq [] False
+  where 
+    qq = case s of
+      True -> shuffleQuestions q
+      _ -> q
 
 questionLearnProceed :: [Question] -> IO ()
 questionLearnProceed ((Question t a):xs) = do

@@ -24,7 +24,7 @@ data Choice = Choice { chText    :: !Text
                      } deriving (Read)
 
 instance Show Choice where
-    show (Choice t s) = unpack t ++ ": " ++ show s
+    show (Choice t s) = unpack t ++ ": " ++ show s ++ " point/s."
 
 data UserAnswer = ChoicesUA [Text]
                | TextualUA !Text

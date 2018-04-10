@@ -26,6 +26,7 @@ dependencies:
 - text
 - filepath
 - random
+- turtle
 
 library:
   source-dirs: src
