@@ -1,23 +1,25 @@
 module Tester.Helpers where
 
 import Tester.Model
-import System.FilePath
+import System.FilePath (takeExtension)
 import System.Random
 import Data.List
 import System.IO.Unsafe
+import qualified Data.Text as T
 
-parseArgsJsonFile :: [String] -> String
-parseArgsJsonFile (x:xs) 
-    | takeExtension x == ".json" = x
+checkJsonFile :: T.Text -> String
+checkJsonFile t 
+    | takeExtension (T.unpack t) == ".json" = T.unpack t
     | otherwise = error "First argument has to be .json file!"
 
 
-getLearnTrainArg :: [String] -> String
-getLearnTrainArg [] = ""
-getLearnTrainArg [mode] 
+checkMode :: Maybe T.Text -> String
+checkMode Nothing = ""
+checkMode (Just t) 
     | mode == "learn" || mode == "train" = mode
     | otherwise = error "Only learn and train modes are available!"
-getLearnTrainArg _ = error "Wrong arguments!"
+    where
+        mode = T.unpack t 
 
 shuffleQuestions :: [Question] -> [Question]
 shuffleQuestions q = shuffleQ (mkStdGen userRandomNum) q

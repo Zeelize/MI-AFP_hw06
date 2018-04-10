@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module CLI (loadAndShow, testerCLI) where
 
 import System.IO
@@ -6,7 +8,7 @@ import qualified Data.ByteString.Lazy as BS
 import qualified Data.Text.Lazy as TL
 import Data.Aeson (decode)
 import Data.Maybe
-import Turtle.Options
+import Turtle
 
 import Tester.Model
 import Tester.Answering
@@ -15,24 +17,21 @@ import Tester.Helpers
 import Tester.Model.AesonInstances
 
 -- options parser
-optParser :: Parser (Bool, Bool)
-optParser = (,) <$> switch "shuffle" 's' "Shuffle randomly questions"
+optParser :: Parser (Bool, Bool, Text, Maybe Text)
+optParser = (,,,) <$> switch "shuffle" 's' "Shuffle randomly questions"
              <*> switch  "answer"  'a' "Give correct answer immediately"
+             <*> argText  "src" "Path to json file"
+             <*> optional (argText  "mode" "Run test in specific mode")
 
 -- demonstration of using aeson to load JSON file with TestSet
-loadAndShow :: IO ()
-loadAndShow = do
-  (s, a) <- options "" parser
-  print s
-  print a
-  args <- getArgs
-  handle <- openFile (parseArgsJsonFile args) ReadMode
+loadAndShow :: String -> String -> Bool -> Bool -> IO ()
+loadAndShow json flag s a = do
+  handle <- openFile json ReadMode
   contentsJSON <- BS.hGetContents handle
-  let flagMode = getLearnTrainArg $ drop 1 args
   let contents = decode contentsJSON :: Maybe TestSet
   case contents of
     Nothing -> error "Invalid JSON file!"
-    Just c -> testProceed c flagMode s a
+    Just c -> testProceed c flag s a
 
 testProceed :: TestSet -> String -> Bool -> Bool -> IO ()
 testProceed (TestSet n i q) f s a = do
@@ -40,14 +39,17 @@ testProceed (TestSet n i q) f s a = do
   case i of
     Just intro -> putStrLn $ TL.unpack intro
     _ -> putStrLn "Show me your knowledge young padavan!"
-  case f of
-    "train" || a -> questionTestProceed qq [] True
-    "learn" -> questionLearnProceed qq
-    _ -> questionTestProceed qq [] False
+  proceedNext f a
   where 
     qq = case s of
       True -> shuffleQuestions q
       _ -> q
+    
+    proceedNext :: String -> Bool -> IO ()
+    proceedNext f a 
+      | f == "learn" = questionLearnProceed qq
+      | f == "train" || a = questionTestProceed qq [] True
+      | otherwise = questionTestProceed qq [] False
 
 questionLearnProceed :: [Question] -> IO ()
 questionLearnProceed ((Question t a):xs) = do
@@ -90,7 +92,9 @@ resultsProceed [] ts tm = do
   putStrLn $ "Your score is " ++ show ts ++ "/" ++ show tm ++ "."
     
 testerCLI :: IO ()
-testerCLI = loadAndShow
+testerCLI = do
+  (s, a, src, mode) <- options "" optParser
+  loadAndShow (checkJsonFile src) (checkMode mode) s a
   -- TODO: make CLI for answering loaded Test
   --       stack exec selftester JSON_FILE [cmd]
   --       - in args there will be one .json file with test, load the TestSet
