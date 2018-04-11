@@ -1,3 +1,14 @@
+{-|
+Module      : Helpers
+Description : Module for help functions used in CLI
+Copyright   : (c) Vojtěch Mráz, 2018
+License     : MIT
+Maintainer  : mrazvoj1@fit.cvut.cz
+Stability   : experimental
+Portability : POSIX
+
+Help module with function for checking if SRC is json file, checking right run mode [learn/train] and random shuffle of questions.
+-}
 module Tester.Helpers where
 
 import Tester.Model

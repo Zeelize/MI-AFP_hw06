@@ -1,3 +1,15 @@
+{-|
+Module      : Evalutation
+Description : Module for evaluating user answers and final scores
+Copyright   : (c) Marek Suchánek, 2018
+                  Vojtěch Mráz, 2018
+License     : MIT
+Maintainer  : mrazvoj1@fit.cvut.cz
+Stability   : experimental
+Portability : POSIX
+
+Module for evaluating user answers, results and calculating max and user score of the question or whole test. 
+-}
 module Tester.Evaluation where
 
 import Tester.Model

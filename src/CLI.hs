@@ -1,5 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+{-|
+Module      : CLI
+Description : Command Line Interface for selftester
+Copyright   : (c) Marek Suchánek, 2018
+                  Vojtěch Mráz, 2018
+License     : MIT
+Maintainer  : mrazvoj1@fit.cvut.cz
+Stability   : experimental
+Portability : POSIX
+
+CLI for selftester. Test yourself with test written in JSON. 
+To see help, run:
+stack exec -- selftester -h
+-}
 module CLI (loadAndShow, testerCLI) where
 
 import System.IO
@@ -21,7 +35,7 @@ optParser :: Parser (Bool, Bool, Text, Maybe Text)
 optParser = (,,,) <$> switch "shuffle" 's' "Shuffle randomly questions"
              <*> switch  "answer"  'a' "Give correct answer immediately"
              <*> argText  "src" "Path to json file"
-             <*> optional (argText  "mode" "Run test in specific mode")
+             <*> optional (argText  "mode" "Run test in specific mode [train/learn]")
 
 -- demonstration of using aeson to load JSON file with TestSet
 loadAndShow :: String -> String -> Bool -> Bool -> IO ()

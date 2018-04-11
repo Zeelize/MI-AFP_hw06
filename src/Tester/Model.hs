@@ -1,3 +1,19 @@
+{-|
+Module      : Model
+Description : Model structure of selftester
+Copyright   : (c) Marek Suchánek, 2018
+                  Vojtěch Mráz, 2018
+License     : MIT
+Maintainer  : mrazvoj1@fit.cvut.cz
+Stability   : experimental
+Portability : POSIX
+
+Init model of test.
+Every test is a TestSet with name, optional intro and set of questions.
+Question contain text and answer.
+Answer is either Single choice, multi choice, textual or numeral.
+For evaluating, model is using useranswer and result data.
+-}
 module Tester.Model where
 
 import Data.Text.Lazy

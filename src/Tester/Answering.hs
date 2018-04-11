@@ -1,3 +1,15 @@
+{-|
+Module      : Answering
+Description : Module for reading and prompting answers
+Copyright   : (c) Marek Suchánek, 2018
+                  Vojtěch Mráz, 2018
+License     : MIT
+Maintainer  : mrazvoj1@fit.cvut.cz
+Stability   : experimental
+Portability : POSIX
+
+Help module with functions for reading answer, prompting answer choices and right answer.
+-}
 module Tester.Answering where
 
 import Data.Maybe
