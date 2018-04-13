@@ -96,7 +96,7 @@ questionTestProceed [] r _ = do
 resultsProceed :: [AnswerResult] -> Points -> Points -> IO ()
 resultsProceed ((AnswerResult a (Result s m c)):xs) ts tm = do
   case isCorrect $ Result s m c of
-    True -> putStrLn $ "You answered correctly: " ++ show s ++ " points!" 
+    True -> putStrLn $ "-> You answered correctly: " ++ show s ++ " points!" 
     _ -> putStrLn $ rightAnswer a
   resultsProceed xs (ts + s) (tm + m)
 
