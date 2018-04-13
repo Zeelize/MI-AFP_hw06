@@ -20,6 +20,7 @@ isCorrect :: Result -> Bool
 isCorrect Result { reCorrectness = Total } = True
 isCorrect _ = False
 
+-- | Class which contains computation of max score, user score and evaluation of user input.
 class Scored a where
   -- | 'maxScore' computes max possible points for instance 'a'.
   maxScore :: a -> Points
@@ -37,15 +38,18 @@ class Scored a where
                                       | x <= 0    = None
                                       | otherwise = Partial
 
+-- | Proceed counting maxScore and user score for whole test set
 instance Scored TestSet where
   maxScore = sum . map maxScore . tsItems
   score ts (ListOfUA uas) = sum . map (uncurry score) $ zip (tsItems ts) uas
   score _ _ = error "Expecting list of answers for whole TestSet"
 
+-- | Proceed counting maxScore and user score for one question
 instance Scored Question where
   maxScore = maxScore . quAnswer
   score = score . quAnswer
 
+-- | Proceed counting maxScore and user score for question answer
 instance Scored Answer where
   maxScore SingleChoice{ ascChoices = chs } = maximum . map chScore $ chs
   maxScore MultiChoice{ amcChoices = chs } = sum . filter (>0) . map chScore $ chs
