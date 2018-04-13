@@ -14,13 +14,18 @@ module Tester.Evaluation where
 
 import Tester.Model
 
+-- | The 'isCorrect' function returns if the user result is for one answer is correct or not.
+-- It takes one argument, of type 'Result'.
 isCorrect :: Result -> Bool
 isCorrect Result { reCorrectness = Total } = True
 isCorrect _ = False
 
 class Scored a where
+  -- | 'maxScore' computes max possible points for instance 'a'.
   maxScore :: a -> Points
+  -- | 'score' computes user score for instance 'a'.
   score :: a -> UserAnswer -> Points
+  -- | 'evaluate' computes result/s for instance 'a' of user answers.
   evaluate :: a -> UserAnswer -> Result
   evaluate x ua = Result { rePoints    = points
                          , reMaxPoints = maxPoints
