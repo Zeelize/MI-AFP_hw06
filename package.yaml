@@ -24,6 +24,10 @@ dependencies:
 - aeson
 - bytestring
 - text
+- filepath
+- random
+- turtle
+- hspec
 
 library:
   source-dirs: src
