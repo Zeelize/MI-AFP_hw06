@@ -27,6 +27,7 @@ dependencies:
 - filepath
 - random
 - turtle
+- hspec
 
 library:
   source-dirs: src
